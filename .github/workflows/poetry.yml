@@ -1,0 +1,39 @@
+name: CI
+on: [push]
+
+jobs:
+  ci:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.7, 3.8]
+        poetry-version: [1.1.4]
+        os: [ubuntu-20.04, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run image
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Check pyproject.toml
+        run: poetry check
+      - name: Install
+        run: poetry install
+      - name: Poetry show tree
+        run: poetry show --tree
+      - name: Run tests
+        run: poetry run pytest tests
+      - name: Poetry build
+        run: poetry build
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.poetry-version }}
+          path: dist/*.whl
+
+
+
