@@ -175,7 +175,8 @@ def plot(regression_erg: Tuple[np.ndarray, np.ndarray],
 
 def aio(func: Callable,
         num_params: int,
-        data: Data
+        data: Data,
+        s: PlotSettings = PlotSettings(),
        ):
     """Do an ODR and plot it
     Runs regression and plots the result
@@ -189,6 +190,8 @@ def aio(func: Callable,
         Number of parameters used in func. Length for beta0.
     data: Data
         Regression data.
+    s: PlotSettings, optional
+        PlotSettings object including labels and other options.
 
     Returns
     -------
@@ -204,5 +207,5 @@ def aio(func: Callable,
     r2: \t {regression_erg[3]}
     '''
     )
-    plot(regression_erg, func, data)
+    plot(regression_erg, func, data, s=s)
     plt.show()
