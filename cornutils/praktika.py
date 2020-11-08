@@ -67,12 +67,14 @@ class Data:
 def find_nearest_idx(array: np.ndarray,
                 value
                 ):
+    """Find nearest index to value in array"""
     return np.argmin( np.abs(array-value) )
 
 def estimation(x: np.ndarray,
                y: np.ndarray,
                num_params: int,
               ):
+    "Stub algorithm to do beta0 estimation"
     beta = np.ones(num_params)
     beta[0] = y[find_nearest_idx(x, 0)]
     return beta
@@ -81,13 +83,28 @@ def regression(func: Callable,
                num_params: int,
                data: Data
               ) -> Tuple[np.ndarray, np.ndarray, float, float]:
-    '''Do an ODR
+    """Do an ODR
     Computes the Regression of func, given values
     and optional standard deviations and a function
     model.
-    Returns `beta`, deviation of `beta` as well
-    as reduced $\chi^2$ and $\R^2$
-    '''
+    
+    Parameters
+    ----------
+    func: Callable
+        Function to use for estimation.
+        Must be func(beta ,x) -> y.
+    num_params: int
+        Number of parameters used in func. Length for beta0.
+    data: Data
+        Regression data.
+
+    Returns
+    -------
+    beta, sbeta, chi2_red, r2: Tuple[np.ndarray, np.ndarray, float, float]
+        beta is the optimal valeu for beta in func, sbeta the
+        standard deviation. chi2_red is the reduced $\chi^2$
+        for the regression, r2 is $R^2$ for the regression.
+    """
     realdata = RealData(data.x, data.y, sx=data.sx, sy=data.sy)
     model = Model(func)
     odr = ODR(realdata, model, beta0 = estimation(data.x,data.y, num_params))
@@ -130,7 +147,7 @@ def plot(regression_erg: Tuple[np.ndarray, np.ndarray],
         Standard deviations in x. Defaults to None
     sy: np.ndarray
         Standard deviations in y. Defaults to None
-    s: PlotSettings
+    s: PlotSettings, optional
         PlotSettings object including labels and other options.
     """
     fig = plt.figure(figsize = (10,6))
@@ -160,9 +177,25 @@ def aio(func: Callable,
         num_params: int,
         data: Data
        ):
-    '''
-    Computes ODR/LS and prints output of regression 
-    '''
+    """Do an ODR and plot it
+    Runs regression and plots the result
+    
+    Parameters
+    ----------
+    func: Callable
+        Function to use for estimation.
+        Must be func(beta ,x) -> y.
+    num_params: int
+        Number of parameters used in func. Length for beta0.
+    data: Data
+        Regression data.
+
+    Returns
+    -------
+    Prints out optimal parameters, respective standard
+    deviation as well as the reduced $\chi^2$ and $R^2$.
+    Returns plot of the result.
+    """
     regression_erg = regression(func, num_params, data)
     print(f'''
     beta: \t {regression_erg[0]}
@@ -172,3 +205,4 @@ def aio(func: Callable,
     '''
     )
     plot(regression_erg, func, data)
+    plt.show()
