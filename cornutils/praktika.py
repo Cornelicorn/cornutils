@@ -2,6 +2,47 @@ import numpy as np
 from typing import Callable, Tuple
 from scipy.odr import ODR, Model, RealData
 import matplotlib.pyplot as plt
+from dataclasses import dataclass
+
+@dataclass
+class PlotSettings:
+    """Plot settings
+    Plot settings dataclass
+
+    Attributes
+    ----------
+    label_x: str, optional
+        Label for the x axis. Defaults to 'x'.
+    label_y: str, optional
+        Label for the x axis. Defaults to 'y'.
+    label_data: str, optional
+        Label for the errorbar plot. Defaults to 'Daten'.
+    label_fit: str, optional
+        Label for the Fit plot. Defaults to 'Fit'
+    label_fit_sigp: str, optional
+        Label for the Fit plot with added standard deviation. Defaults to 'Fit + $\sigma$'.
+    label_fit_sigm: str, optional
+        Label for the Fit plot with substracted standard deviation. Defaults to 'Fit - $\sigma$'.
+    plot_sigp: bool, optional
+        Whether to plot the $+\sigma$ function. Default to true
+    plot_sigm: bool, optional
+        Whether to plot the $-\sigma$ function. Defaults to true
+    connect: str, optional
+        Connection method for the data points, e.g. 'dotted'. Defaults to None.
+    loc_legend: str, optional
+        Location of the legend. Defaults to 'lower right'
+    """
+    label_x: str = 'x'
+    label_y: str = 'y'
+    label_data: str = 'Daten'
+    label_fit: str = 'Fit'
+    label_fit_sigp: str = 'Fit + $\sigma$'
+    label_fit_sigm: str = 'Fit - $\sigma$'
+    plot_sigp: bool = True
+    plot_sigm: bool = True
+    connect: str = None
+    loc_legend: str = 'lower right'
+
 
 def find_nearest_idx(array: np.ndarray,
                 value
@@ -55,33 +96,50 @@ def plot(regression_erg: Tuple[np.ndarray, np.ndarray],
          y: np.ndarray,
          sx: np.ndarray = None,
          sy: np.ndarray = None,
-         connect: str = '', # e.g. 'dotted'
-         label: Tuple[str, str, str, str, str, str] = ('x', 'y','Daten','Fit', 'Fit + $\sigma$', 'Fit - $\sigma$'),
+         s: PlotSettings = PlotSettings(),
         ):
-    '''
-    Plots `(x, y)` with optional errors `(sx, sy)` and the
-    fit given a function `func` and a Tuple `regression_erg`
-    which consists of the `beta` array and the error in `beta`
-    '''
+    """Quickly plot data and ODR regression
+    Plots experimental data with optional standard deviations
+    as well as ODR regression.
+
+    Parameters
+    ----------
+    regression_erg: Tuple[np.ndarray, np.ndarray]
+        Output of regression.
+    func: Callable
+        Callable to use for plotting the data.
+    x: np.ndarray
+        x values.
+    y: np.ndarray
+        y values.
+    sx: np.ndarray
+        Standard deviations in x. Defaults to None
+    sy: np.ndarray
+        Standard deviations in y. Defaults to None
+    s: PlotSettings
+        PlotSettings object including labels and other options.
+    """
     fig = plt.figure(figsize = (10,6))
     
     plt.errorbar(x, y, fmt='rx',
-                 label=label[2],
+                 label=s.label_data,
                  xerr=sx, yerr=sy, ecolor='black',
                  dash_capstyle='butt', capsize=3,
-                 ls = connect)
+                 ls = s.connect)
 
     xmin = np.amin(x)
     xmax = np.amax(x)
     t = np.arange(xmin, xmax, (xmax-xmin)/2000)
     
-    plt.plot(t, func(regression_erg[0],t), label = label[3])
-    plt.plot(t, func(regression_erg[0]+regression_erg[1],t), label = label[4])
-    plt.plot(t, func(regression_erg[0]-regression_erg[1],t), label = label[5])
+    plt.plot(t, func(regression_erg[0],t), label = s.label_fit)
+    if s.plot_sigp:
+        plt.plot(t, func(regression_erg[0]+regression_erg[1],t), label = s.label_fit_sigp)
+    if s.plot_sigm:
+        plt.plot(t, func(regression_erg[0]-regression_erg[1],t), label = s.label_fit_sigm)
     
-    plt.xlabel(label[0])
-    plt.ylabel(label[1])
-    plt.legend(loc='lower right')
+    plt.xlabel(s.label_x)
+    plt.ylabel(s.label_y)
+    plt.legend(loc=s.loc_legend)
     plt.show()
 
 def aio(func: Callable,
