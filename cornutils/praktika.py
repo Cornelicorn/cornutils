@@ -81,7 +81,8 @@ def estimation(x: np.ndarray,
 
 def regression(func: Callable,
                num_params: int,
-               data: Data
+               data: Data,
+               estimation: Callable = estimation,
               ) -> Tuple[np.ndarray, np.ndarray, float, float]:
     """Do an ODR
     Computes the Regression of func, given values
@@ -189,6 +190,7 @@ def aio(func: Callable,
         num_params: int,
         data: Data,
         s: PlotSettings = PlotSettings(),
+        estimation: Callable = estimation,
        ):
     """Do an ODR and plot it
     Runs regression and plots the result
@@ -211,7 +213,7 @@ def aio(func: Callable,
     deviation as well as the reduced $\chi^2$ and $R^2$.
     Returns plot of the result.
     """
-    regression_erg = regression(func, num_params, data)
+    regression_erg = regression(func, num_params, data, estimation)
     print(f'''
     beta: \t {regression_erg[0]}
     sbeta: \t {regression_erg[1]}
