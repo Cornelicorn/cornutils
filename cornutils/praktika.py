@@ -87,7 +87,7 @@ def regression(func: Callable,
     Computes the Regression of func, given values
     and optional standard deviations and a function
     model.
-    
+
     Parameters
     ----------
     func: Callable
@@ -108,20 +108,29 @@ def regression(func: Callable,
     realdata = RealData(data.x, data.y, sx=data.sx, sy=data.sy)
     model = Model(func)
     odr = ODR(realdata, model, beta0 = estimation(data.x,data.y, num_params))
-    
+
     # If sx is given do odr, else just do least-squares
     fit_type = 0 if isinstance(data.sx, np.ndarray) else 2
     odr.set_job(fit_type=fit_type)
-    
+
     output = odr.run()
-    
+
     residuals = data.y - func(output.beta, data.x)
     chi_arr =  residuals / data.sy
     chi2_red = np.sum(chi_arr**2) / (len(data.x)-len(output.beta))
     ybar = np.sum(data.y/(data.sy**2))/np.sum(1/data.sy**2)
     r2 = 1 - np.sum(chi_arr**2)/np.sum(((data.y-ybar)/data.sy)**2)
-    
+
     return output.beta, output.sd_beta*np.sqrt(len(data.x)), chi2_red, r2
+
+def plotData(data: np.ndarray):
+    data = np.asarray(data)
+
+    fig = plt.figure(figsize = (10,6))
+    for obj in data:
+        plt.errorbar(obj.x, obj.y,
+                 xerr=obj.sx, yerr=obj.sy,
+                 dash_capstyle='butt', capsize=3,)
 
 
 def plot(regression_erg: Tuple[np.ndarray, np.ndarray],
@@ -151,7 +160,7 @@ def plot(regression_erg: Tuple[np.ndarray, np.ndarray],
         PlotSettings object including labels and other options.
     """
     fig = plt.figure(figsize = (10,6))
-    
+
     plt.errorbar(data.x, data.y, fmt='rx',
                  label=s.label_data,
                  xerr=data.sx, yerr=data.sy, ecolor='black',
@@ -161,13 +170,13 @@ def plot(regression_erg: Tuple[np.ndarray, np.ndarray],
     xmin = np.amin(data.x)
     xmax = np.amax(data.x)
     t = np.arange(xmin, xmax, (xmax-xmin)/2000)
-    
+
     plt.plot(t, func(regression_erg[0],t), label = s.label_fit)
     if s.plot_sigp:
         plt.plot(t, func(regression_erg[0]+regression_erg[1],t), label = s.label_fit_sigp)
     if s.plot_sigm:
         plt.plot(t, func(regression_erg[0]-regression_erg[1],t), label = s.label_fit_sigm)
-    
+
     plt.xlabel(s.label_x)
     plt.ylabel(s.label_y)
     plt.legend(loc=s.loc_legend)
@@ -180,7 +189,7 @@ def aio(func: Callable,
        ):
     """Do an ODR and plot it
     Runs regression and plots the result
-    
+
     Parameters
     ----------
     func: Callable
