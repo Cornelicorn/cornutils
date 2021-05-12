@@ -115,11 +115,14 @@ def regression(func: Callable,
 
     output = odr.run()
 
-    residuals = data.y - func(output.beta, data.x)
-    chi_arr =  residuals / data.sy
-    chi2_red = np.sum(chi_arr**2) / (len(data.x)-len(output.beta))
-    ybar = np.sum(data.y/(data.sy**2))/np.sum(1/data.sy**2)
-    r2 = 1 - np.sum(chi_arr**2)/np.sum(((data.y-ybar)/data.sy)**2)
+    chi2_red = 0
+    r2 = 0
+    if isinstance(data.sy, np.ndarray):
+        residuals = data.y - func(output.beta, data.x)
+        chi_arr =  residuals / data.sy
+        chi2_red = np.sum(chi_arr**2) / (len(data.x)-len(output.beta))
+        ybar = np.sum(data.y/(data.sy**2))/np.sum(1/data.sy**2)
+        r2 = 1 - np.sum(chi_arr**2)/np.sum(((data.y-ybar)/data.sy)**2)
 
     return output.beta, output.sd_beta*np.sqrt(len(data.x)), chi2_red, r2
 
