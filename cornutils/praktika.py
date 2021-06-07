@@ -31,6 +31,8 @@ class PlotSettings:
         Connection method for the data points, e.g. 'dotted'. Defaults to None.
     loc_legend: str, optional
         Location of the legend. Defaults to 'lower right'
+    title: str, optional
+        Title for the plot
     """
     label_x: str = 'x'
     label_y: str = 'y'
@@ -42,6 +44,7 @@ class PlotSettings:
     plot_sigm: bool = True
     connect: str = None
     loc_legend: str = 'lower right'
+    title: str = None
 
 
 @dataclass
@@ -183,6 +186,7 @@ def plot(regression_erg: Tuple[np.ndarray, np.ndarray],
 
     plt.xlabel(s.label_x)
     plt.ylabel(s.label_y)
+    plt.title(s.title)
     plt.legend(loc=s.loc_legend)
     plt.show()
 
