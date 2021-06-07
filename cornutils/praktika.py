@@ -1,5 +1,5 @@
 import numpy as np
-from typing import Callable, Tuple
+from typing import Callable, Tuple, Any
 from scipy.odr import ODR, Model, RealData
 import matplotlib.pyplot as plt
 from dataclasses import dataclass
@@ -32,7 +32,15 @@ class PlotSettings:
     loc_legend: str, optional
         Location of the legend. Defaults to 'lower right'
     title: str, optional
-        Title for the plot
+        Title for the plot. Defaults to None
+    file: str, optional
+        Path for a file to save the figure to. Defaults to None.
+    dpi: int, optional
+        Only useful with file specififed, dpi for the saved file.
+        Defaults to 'figure', which will use the figures DPI
+    file_format: str, optional
+        Only useful with file specififed, file format of the saved plot.
+        Defaults to 'png'.
     """
     label_x: str = 'x'
     label_y: str = 'y'
@@ -45,6 +53,9 @@ class PlotSettings:
     connect: str = None
     loc_legend: str = 'lower right'
     title: str = None
+    file: str = None
+    dpi: Any = 'figure'
+    file_format: str = 'png'
 
 
 @dataclass
@@ -188,6 +199,8 @@ def plot(regression_erg: Tuple[np.ndarray, np.ndarray],
     plt.ylabel(s.label_y)
     plt.title(s.title)
     plt.legend(loc=s.loc_legend)
+    if s.file:
+        plt.savefig(f"{s.file}.{s.file_format}", dpi=s.dpi, format=s.file_format)
     plt.show()
 
 def aio(func: Callable,
