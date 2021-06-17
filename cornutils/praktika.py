@@ -208,6 +208,7 @@ def aio(func: Callable,
         data: Data,
         s: PlotSettings = PlotSettings(),
         estimation: Callable = estimation,
+        return_result: bool = False,
        ):
     """Do an ODR and plot it
     Runs regression and plots the result
@@ -240,3 +241,5 @@ def aio(func: Callable,
     )
     plot(regression_erg, func, data, s=s)
     plt.show()
+    if return_result:
+        return regression_erg
