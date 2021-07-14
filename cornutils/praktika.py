@@ -206,9 +206,9 @@ def plot(regression_erg: Tuple[np.ndarray, np.ndarray],
 def aio(func: Callable,
         num_params: int,
         data: Data,
-        s: PlotSettings = PlotSettings(),
         estimation: Callable = estimation,
         return_result: bool = False,
+        **kwargs,
        ):
     """Do an ODR and plot it
     Runs regression and plots the result
@@ -239,7 +239,7 @@ def aio(func: Callable,
     r2: \t {regression_erg[3]}
     '''
     )
-    plot(regression_erg, func, data, s=s)
+    plot(regression_erg, func, data, **kwargs)
     plt.show()
     if return_result:
         return regression_erg
