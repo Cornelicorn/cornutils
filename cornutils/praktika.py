@@ -155,6 +155,7 @@ def plot(regression_erg: Tuple[np.ndarray, np.ndarray],
          func: Callable,
          data: Data,
          s: PlotSettings = PlotSettings(),
+         newfig: bool = True,
         ):
     """Quickly plot data and ODR regression
     Plots experimental data with optional standard deviations
@@ -177,7 +178,8 @@ def plot(regression_erg: Tuple[np.ndarray, np.ndarray],
     s: PlotSettings, optional
         PlotSettings object including labels and other options.
     """
-    fig = plt.figure(figsize = (10,6))
+    if newfig:
+        fig = plt.figure(figsize = (10,6))
 
     plt.errorbar(data.x, data.y, fmt='rx',
                  label=s.label_data,
@@ -201,7 +203,6 @@ def plot(regression_erg: Tuple[np.ndarray, np.ndarray],
     plt.legend(loc=s.loc_legend)
     if s.file:
         plt.savefig(f"{s.file}.{s.file_format}", dpi=s.dpi, format=s.file_format)
-    plt.show()
 
 def aio(func: Callable,
         num_params: int,
@@ -240,6 +241,5 @@ def aio(func: Callable,
     '''
     )
     plot(regression_erg, func, data, **kwargs)
-    plt.show()
     if return_result:
         return regression_erg
